@@ -1,0 +1,2 @@
+ERROR: ipfsapi 0.4.4 has requirement ipfshttpclient<0.5.0,>=0.4.10, but you'll have ipfshttpclient 0.7.0a1 which is incompatible.
+ERROR: ethereum-client-utils 0.3.2 has requirement six==1.10.0, but you'll have six 1.15.0 which is incompatible.

@@ -1,0 +1,8 @@
+var myTx = myInterface.new(
+  "This is the greeting with which we will instantiate the contract. Hi!",
+  {
+    from: eth.accounts[0],
+    data: myHex,
+    gas: 1000000
+  }
+)
