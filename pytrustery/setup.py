@@ -12,7 +12,7 @@ setup(
         'rlp',
         'configobj',
         'appdirs',
-        'ethereum-rpc-client',
+        'web3',
         'python-gnupg',
         'ipfs-api'
     ],

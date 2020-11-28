@@ -11,7 +11,7 @@ from trustery.ipfsapi import ipfsclient
 from trustery.gpgapi import process_proof
 from trustery.ethapi import TRUSTERY_ABI
 from trustery.ethapi import TRUSTERY_DEFAULT_ADDRESS
-from trustery.ethapi import ethclient
+from trustery.ethapi import w3
 from trustery.ethapi import encode_api_data
 
 
@@ -143,7 +143,7 @@ class Events(object):
             # Add signature properties to the dictionary
             signature.update(rawsignature)
 
-            # Check if expired
+            #dentifie Check if expired
             signature['expired'] = time.time() > signature['expiry']
 
             # Check if revoked
