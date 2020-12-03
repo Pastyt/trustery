@@ -234,10 +234,6 @@ def ipfsaddpgp(keyid):
     transactions = Transactions()
     click.echo()
 
-    try:
-        transactions.add_pgp_attribute_over_ipfs(keyid)
-    except ValueError as e:
-        click.echo("Error: " + e.message)
-        return
+    transactions.add_pgp_attribute_over_ipfs(keyid)
 
     click.echo("Transaction sent.")

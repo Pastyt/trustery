@@ -10,7 +10,7 @@ from trustery.ipfsapi import ipfsclient
 from trustery.gpgapi import generate_pgp_attribute_data
 from trustery.ethapi import TRUSTERY_ABI
 from trustery.ethapi import TRUSTERY_DEFAULT_ADDRESS
-
+import sys
 from trustery.ethapi import encode_api_data
 
 class Transactions(object):
@@ -81,13 +81,13 @@ class Transactions(object):
         data: the data of the attribute.
         """
         #  Store the data as an IPFS block and get its key.
-        ipfs_key = ipfsclient.block_put(io.StringIO(data))['Key']
+        #ipfs_key = ipfsclient.block_put(io.StringIO(data))['Key']
 
         # Generate Trustery-specific URI for the IPFS block.
-        ipfs_uri = 'ipfs-block://' + ipfs_key
-
+        #ipfs_uri = 'ipfs-block://' + ipfs_key
+        ipfs_data = ipfsclient.add_str(data)
         # Add the attribute.
-        self.add_attribute(attributetype, has_proof, identifier, ipfs_uri, datahash='')
+        self.add_attribute(attributetype, has_proof, identifier, ipfs_data, datahash='')
 
     def add_pgp_attribute_over_ipfs(self, keyid):
         """
@@ -99,8 +99,11 @@ class Transactions(object):
         (fingerprint, data) = generate_pgp_attribute_data(keyid, self.from_address)
 
         # Express identifier as fingerprint in binary format.
-        identifier = fingerprint.decode('hex')
 
+        #identifier = fingerprint.decode('hex')
+        identifier = fingerprint
+        raise ValueError
+    
         self.add_attribute_over_ipfs(
             attributetype='pgp-key',
             has_proof=True,

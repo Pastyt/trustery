@@ -37,31 +37,32 @@ def generate_pgp_attribute_data(keyid, address):
     # Export public key.
     public_key = gpgclient.export_keys(keyid, minimal=True)
 
+
     # Use temporary GPG interface to check that only one key has been exported and to get its fingerprint.
     tempgpg = TempGPG()
-    try:
+    #try:
         # Import public key.
-        import_results = tempgpg.gpgclient.import_keys(public_key)
+    import_results = tempgpg.gpgclient.import_keys(public_key)
 
         # Check that only one key has been imported.
-        if import_results.count != 1:
-            raise ValueError("invalid PGP key ID specified")
+        #if import_results.counts != 1:
+        #   raise ValueError("invalid PGP key ID specified")
 
         # Get key fingerprint.
-        fingerprint = str(import_results.fingerprints[0])
-    finally:
+    fingerprint = str(import_results.fingerprints[0])
+    #finally:
         # Destroy temporary GPG interface.
-        tempgpg.destroy()
+    tempgpg.destroy()
 
     # Generate cryptographic proof signature.
-    proof = gpgclient.sign('Ethereum address: ' + address, keyid=fingerprint).data
+    proof = gpgclient.sign('Ethereum address: ' + address, keyid=fingerprint)
 
     # Check that a proof was actually generated.
     if not proof:
         raise ValueError("a PGP key was specified that does not have a corresponding secret key")
 
     # Concatenate public key and cryptographic proof.
-    data = public_key + '\n' + proof
+    data = public_key + '\n' + str(proof)
 
     # Return data and fingerprint.
     return (fingerprint, data)
