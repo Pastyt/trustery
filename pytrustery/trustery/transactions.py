@@ -1,7 +1,9 @@
 """API for making Trustery tranactions."""
 
-import io
+from web3 import Web3
+from trustery.utils_py3 import decode_hex
 
+import io
 from ethereum import abi
 from trustery.ethapi import w3,myContract
 from trustery.ipfsapi import ipfsclient
@@ -57,15 +59,11 @@ class Transactions(object):
         datahash: the Keccak hash of the data of the attribute if it is stored off-blockchain.
         identifier has type str so need to change to bytes32
         """
-        tx=myContract.functions.addAttribute( attributetype , has_proof , bytes( identifier, 'utf-8' ) , data , datahash ).transact()
-        tx_receipt = w3.eth.waitForTransactionReceipt(tx)
-        print(myContract.events.AttributeAdded().processReceipt(tx_receipt))
+        myContract.functions.addAttribute( attributetype, has_proof,
+        bytes( identifier, 'utf-8' ) , data , datahash ).transact()      
     
     def add_attribute_with_hash(self, attributetype, has_proof, identifier, data):
-        """
-        Send a transaction to add an identity attribute, automatically calculating its datahash if the data is stored remotely.
-
-        attributetype: the type of address.
+        """{"address": TRUSTERY_DEFAULT_ADDRESS}e of address.
         has_proof: True if the attribute has a cryptographic proof, otherwise False.
         identifier: the indexable identifier of the attribute.
         data: the data of the attribute.
@@ -118,9 +116,7 @@ class Transactions(object):
         attributeID: the ID of the attribute.
         expiry: the expiry time of the attriute.
         """
-        tx=myContract.functions.signAttribute( attributeID , expiry ).transact()
-        tx_receipt = w3.eth.waitForTransactionReceipt(tx)
-        print(myContract.events.AttributeSigned().processReceipt(tx_receipt))
+        myContract.functions.signAttribute( attributeID , expiry ).transact()
         
 
     def revoke_signature(self, signatureID):
@@ -129,7 +125,5 @@ class Transactions(object):
 
         signatureID: the ID of the signature.
         """
-        tx=myContract.functions.revokeSignature( signatureID ).transact()
-        tx_receipt = w3.eth.waitForTransactionReceipt(tx)
-        print(myContract.events.SignatureRevoked().processReceipt(tx_receipt))
+        myContract.functions.revokeSignature( signatureID ).transact()
         

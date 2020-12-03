@@ -203,26 +203,26 @@ def retrieve(attributeid):
 
 @cli.command()
 @click.option('--attributetype', help='Attribute type', type=STR)
-@click.option('--identifier', help='Attribute identifier', type=STR)
+@click.option('--identifier', help='Attribute identifier', type=click.INT)
 @click.option('--owner', help='Attribute owner', type=STR)
 def search(attributetype, identifier, owner):
     """Search for attributes."""
     # Pad identifiers with zeros.
+    """
     if identifier is not None:
         if identifier.startswith('0x'): # Hex data.
             identifier = identifier.ljust(66, '0')
         else:
             identifier = identifier.ljust(32, '\x00')
-
+    """
     events = Events()
     attributes = events.filter_attributes(None, owner, identifier)
-
     for attribute in attributes:
         if attributetype is not None and attributetype != attribute['attributeType']:
             continue
 
         signatures_status = events.get_attribute_signatures_status(attribute['attributeID'])
-
+        
         echo_attribute_block(attribute, signatures_status)
         click.echo()
 

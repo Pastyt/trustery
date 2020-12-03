@@ -9,12 +9,16 @@ def echo_attribute_block(attribute, signatures_status=None):
     """Echo a console block representing basic data about the attribute."""
     if signatures_status is None and 'signatures_status' in attribute:
         signatures_status = attribute['signatures_status']
-
     # Encode attribute identifier as hex if it contains non-ASCII characters.
-    if not all(ord(c) < 128 for c in attribute['identifier']):
-        attribute['identifier'] = '0x' + attribute['identifier'].rstrip('\x00').encode('hex')
+    #if not all(ord(c) < 128 for c in attribute['identifier']):
+    #    attribute['identifier'] = '0x' + attribute['identifier'].rstrip('\x00').encode('hex')
 
-    click.echo("Attribute ID #" + str(attribute['attributeID']) + ':')
+    # Decode all before echo cos inside function click give error
+    #int.from_bytes( bytes, byteorder, *, signed=False )
+    attribute['attributeID'] = str(attribute['attributeID'])
+    attribute['identifier'] = str(bytes(attribute['identifier']).decode(encoding='utf-8',errors= 'strict'))
+
+    click.echo("Attribute ID #" + attribute['attributeID'] + ':')
     click.echo("\tType: " + attribute['attributeType'])
     click.echo("\tOwner: " + attribute['owner']
         + (" [trusted]" if userconfig.is_trusted(attribute['owner']) else " [untrusted]"))

@@ -1,19 +1,16 @@
 """API for retrieving Trustery events."""
 
 import time
-
 from ethereum import abi
 from ethereum import block
 from ethereum.utils import big_endian_to_int
-#from rlp.utils import decode_hex #ImportError: cannot import name 'decode_hex' from 'rlp.utils'
 from trustery.utils_py3 import decode_hex
 from trustery.ipfsapi import ipfsclient
 from trustery.gpgapi import process_proof
 from trustery.ethapi import TRUSTERY_ABI
 from trustery.ethapi import TRUSTERY_DEFAULT_ADDRESS
-from trustery.ethapi import w3
+from trustery.ethapi import w3, myContract, encode_web3_hex
 from trustery.ethapi import encode_api_data
-
 
 class Events(object):
     """API for retrieving Trustery events."""
@@ -27,16 +24,22 @@ class Events(object):
 
         # Initialise contract ABI.
         self._contracttranslator = abi.ContractTranslator(TRUSTERY_ABI)
-
+    """
     def _get_event_id_by_name(self, event_name):
-        """
+
         Get the ID of an event given its name.
 
         event_name: the name of the event.
-        """
-        for event_id, event in self._contracttranslator.event_data.iteritems():
+
+        for event_id, event in self._contracttranslator.event_data.items():
             if event['name'] == event_name:
                 return event_id
+    """
+    def _get_all_events(self):
+        events = {}
+        for event_id, event in self._contracttranslator.event_data.items():
+            events[event['name']] = encode_web3_hex(event_id)
+        return events
 
     def _get_logs(self, topics, event_name=None):
         """
@@ -46,25 +49,40 @@ class Events(object):
         event_name: the name of the event.
         """
         # Set the event topic to the event ID if the event name is specified.
+        events = self._get_all_events()
+
         if event_name is None:
             event_topic = None
         else:
-            event_topic = self._get_event_id_by_name(event_name)
-
+            event_topic = events[event_name]
         # Prepent the event type to the topics.
-        topics = [event_topic] + topics
+        topics = [event_topic] + [encode_web3_hex(topic) for topic in topics]
         # Encode topics to be sent to the Ethereum client.
-        topics = [encode_api_data(topic) for topic in topics]
-
+        #Setting up filter to get transaction through topics
+        filter = w3.eth.filter({
+            'address': myContract.address,
+            'topics': topics, 
+            'fromBlock': 5000} #only for tests, need to be 0
+            )
         # Get logs from Ethereum client.
-        logs = ethclient.get_logs(
-            from_block='earliest',
-            address=self.address,
-            topics=topics,
-        )
+        getlogs = w3.eth.getFilterLogs(filter.filter_id)
+        logs = []
+        #Choose how to decode event by event name
+        #TODO change in pythonic way
+        if event_name == 'AttributeAdded':
+            for log in getlogs:
+                logs.append(myContract.events.AttributeAdded().processLog(log))
+        elif event_name == 'AttributeSigned':
+            for log in getlogs:
+                logs.append(myContract.events.AttributeSigned().processLog(log))
+        else:
+            for log in getlogs:
+                logs.append(myContract.events.SignatureRevoked().processLog(log))
 
         # Decode logs using the contract ABI.
+        
         decoded_logs = []
+        """
         for log in logs:
             logobj = processblock.Log(
                 log['address'][2:],
@@ -73,7 +91,12 @@ class Events(object):
             )
             decoded_log = self._contracttranslator.listen(logobj, noprint=True)
             decoded_logs.append(decoded_log)
-
+        """
+        for log in logs:
+            temp = {}
+            temp['address']= log['address']
+            temp.update(log['args'])
+            decoded_logs.append(temp)
         return decoded_logs
 
     def filter_attributes(self, attributeID=None, owner=None, identifier=None):
@@ -134,8 +157,7 @@ class Events(object):
         }
 
         # Filter signatures for the specified attribute
-        rawsignatures = self.filter_signatures(attributeID=attributeID)
-
+        rawsignatures = self.filter_signatures(attributeID=attributeID)       
         # Process signatures
         for rawsignature in rawsignatures:
             signature = {}
@@ -152,7 +174,6 @@ class Events(object):
                 signature['revocation'] = rawrevocations
             else:
                 signature['revocation'] = False
-
             # Check if valid
             if not signature['expired'] and not signature['revocation']:
                 signature['valid'] = True

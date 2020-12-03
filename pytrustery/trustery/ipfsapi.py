@@ -1,5 +1,5 @@
 """Interface for IPFS."""
-
+#TODO change IPFSAPI to ipfshttpclient
 import ipfsApi
 
 

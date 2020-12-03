@@ -10,14 +10,24 @@ from trustery.utils_py3 import decode_hex
 #from trustery.testcontract import w3,myContract
 import trustery
 # Trustery contract constants.
-#TRUSTERY_DEFAULT_ADDRESS = '0x9E84677B2874c1d8603Cde0A68225F5e86D7B200' 
-TRUSTERY_DEFAULT_ADDRESS = '0xd6b7b79Fe0c787566f8d528fA4991a5fD15caE15'
+TRUSTERY_DEFAULT_ADDRESS = '0x15E03Ed585DD03082085bdBe400B2EA268b2819C'
 TRUSTERY_ABI = json.load(open(os.path.join(os.path.dirname(trustery.__file__), 'trustery_abi.json')))
 # Ethereum client interface.
-w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545')) #ethclient
-w3.eth.defaultAccount=w3.eth.accounts[0]
+w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
+w3.eth.defaultAccount=w3.eth.coinbase
+#Allow transactions from web3
 w3.geth.personal.unlock_account(w3.eth.defaultAccount,'1', 15000)
 myContract = w3.eth.contract(address=TRUSTERY_DEFAULT_ADDRESS, abi=TRUSTERY_ABI)
+
+def encode_web3_hex(data):
+    if data!=None:
+        #Best solution because toHex return 0x , need 0x0
+        data = w3.toHex(data)
+        data = '0x' + '0' * (66 - len(data)) + data[2:]
+    else:
+        data = None
+    return data
+
 def encode_api_data(data):
     """
     Prepare arbitrary data to be send to the Ethereum client via the API.
