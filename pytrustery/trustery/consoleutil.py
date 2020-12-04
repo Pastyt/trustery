@@ -16,7 +16,7 @@ def echo_attribute_block(attribute, signatures_status=None):
     # Decode all before echo cos inside function click give error
     #int.from_bytes( bytes, byteorder, *, signed=False )
     attribute['attributeID'] = str(attribute['attributeID'])
-    attribute['identifier'] = str(bytes(attribute['identifier']).decode(encoding='utf-8',errors= 'strict'))
+    attribute['identifier'] = str(attribute['identifier'])
 
     click.echo("Attribute ID #" + attribute['attributeID'] + ':')
     click.echo("\tType: " + attribute['attributeType'])

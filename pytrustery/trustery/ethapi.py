@@ -10,7 +10,7 @@ from trustery.utils_py3 import decode_hex
 #from trustery.testcontract import w3,myContract
 import trustery
 # Trustery contract constants.
-TRUSTERY_DEFAULT_ADDRESS = '0x15E03Ed585DD03082085bdBe400B2EA268b2819C'
+TRUSTERY_DEFAULT_ADDRESS = '0x76402F0BEf9c76A627Bd70ca214B2F0EB8DD66A6'
 TRUSTERY_ABI = json.load(open(os.path.join(os.path.dirname(trustery.__file__), 'trustery_abi.json')))
 # Ethereum client interface.
 w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))

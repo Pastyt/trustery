@@ -62,7 +62,7 @@ class Events(object):
         filter = w3.eth.filter({
             'address': myContract.address,
             'topics': topics, 
-            'fromBlock': 5000} #only for tests, need to be 0
+            'fromBlock': 0} 
             )
         # Get logs from Ethereum client.
         getlogs = w3.eth.getFilterLogs(filter.filter_id)
@@ -82,16 +82,7 @@ class Events(object):
         # Decode logs using the contract ABI.
         
         decoded_logs = []
-        """
-        for log in logs:
-            logobj = processblock.Log(
-                log['address'][2:],
-                [big_endian_to_int(decode_hex(topic[2:])) for topic in log['topics']],
-                decode_hex(log['data'][2:])
-            )
-            decoded_log = self._contracttranslator.listen(logobj, noprint=True)
-            decoded_logs.append(decoded_log)
-        """
+
         for log in logs:
             temp = {}
             temp['address']= log['address']
@@ -206,16 +197,17 @@ class Events(object):
         # Download IPFS data if necessary.
         if attribute['data'].startswith('ipfs-block://'):
             ipfs_key = attribute['data'][len('ipfs-block://'):]
-            attribute['data'] = ipfsclient.block_get(ipfs_key)
+            attribute['data'] = ipfsclient.cat(ipfs_key)
 
         # Verify PGP proof.
+        """
         if attribute['attributeType'] == 'pgp-key':
             attribute['proof_valid'] = self.verify_attribute_pgp_proof(attribute)
 
         # Set proof validity to unknown if the attribute has a proof but we did not know how to process it.
         if attribute['has_proof'] and 'proof_valid' not in attribute:
             attribute['proof_valid'] = None
-
+        """
         return attribute
 
     def verify_attribute_pgp_proof(self, attribute):

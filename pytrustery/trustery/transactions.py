@@ -59,8 +59,8 @@ class Transactions(object):
         datahash: the Keccak hash of the data of the attribute if it is stored off-blockchain.
         identifier has type str so need to change to bytes32
         """
-        myContract.functions.addAttribute( attributetype, has_proof,
-        bytes( identifier, 'utf-8' ) , data , datahash ).transact()      
+        myContract.functions.addAttribute( attributetype, has_proof, 
+        identifier, data , datahash ).transact()      
     
     def add_attribute_with_hash(self, attributetype, has_proof, identifier, data):
         """{"address": TRUSTERY_DEFAULT_ADDRESS}e of address.
@@ -84,8 +84,8 @@ class Transactions(object):
         #ipfs_key = ipfsclient.block_put(io.StringIO(data))['Key']
 
         # Generate Trustery-specific URI for the IPFS block.
-        #ipfs_uri = 'ipfs-block://' + ipfs_key
         ipfs_data = ipfsclient.add_str(data)
+        ipfs_data = 'ipfs-block://' + ipfs_data
         # Add the attribute.
         self.add_attribute(attributetype, has_proof, identifier, ipfs_data, datahash='')
 
@@ -102,7 +102,6 @@ class Transactions(object):
 
         #identifier = fingerprint.decode('hex')
         identifier = fingerprint
-        raise ValueError
     
         self.add_attribute_over_ipfs(
             attributetype='pgp-key',
