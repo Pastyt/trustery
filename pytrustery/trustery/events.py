@@ -2,15 +2,11 @@
 
 import time
 from ethereum import abi
-from ethereum import block
-from ethereum.utils import big_endian_to_int
-from trustery.utils_py3 import decode_hex
 from trustery.ipfsapi import ipfsclient
 from trustery.gpgapi import process_proof
 from trustery.ethapi import TRUSTERY_ABI
 from trustery.ethapi import TRUSTERY_DEFAULT_ADDRESS
 from trustery.ethapi import w3, myContract, encode_web3_hex
-from trustery.ethapi import encode_api_data
 
 class Events(object):
     """API for retrieving Trustery events."""
@@ -197,17 +193,17 @@ class Events(object):
         # Download IPFS data if necessary.
         if attribute['data'].startswith('ipfs-block://'):
             ipfs_key = attribute['data'][len('ipfs-block://'):]
-            attribute['data'] = ipfsclient.cat(ipfs_key)
+            attribute['data'] = ipfsclient.cat(ipfs_key).decode('utf-8')
 
         # Verify PGP proof.
-        """
+        
         if attribute['attributeType'] == 'pgp-key':
             attribute['proof_valid'] = self.verify_attribute_pgp_proof(attribute)
 
         # Set proof validity to unknown if the attribute has a proof but we did not know how to process it.
         if attribute['has_proof'] and 'proof_valid' not in attribute:
             attribute['proof_valid'] = None
-        """
+        
         return attribute
 
     def verify_attribute_pgp_proof(self, attribute):
@@ -227,13 +223,13 @@ class Events(object):
 
         if not proof:
             return False
-
+            
         (proof_address, proof_fingerprint) = proof
         if (
             # Check that the fingerprints match.
-            proof_fingerprint.decode('hex') == attribute['identifier'].rstrip('\x00')
+            proof_fingerprint == bytes(attribute['identifier']).decode('utf-8')
             # Check that the Ethereum addresses match.
-            and proof_address == '0x' + attribute['owner']
+            and proof_address == attribute['owner']
             ):
             return True
 

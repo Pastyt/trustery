@@ -12,11 +12,11 @@ contract Trustery {
     uint public signcount;
     uint public revocations;
 
-    event AttributeAdded(uint indexed attributeID, address indexed owner, string attributeType, bool has_proof, string indexed identifier, string data, string datahash);
+    event AttributeAdded(uint indexed attributeID, address indexed owner, string attributeType, bool has_proof, bytes32 indexed identifier, string data, string datahash);
     event AttributeSigned(uint indexed signatureID, address indexed signer, uint indexed attributeID, uint expiry);
     event SignatureRevoked(uint indexed revocationID, uint indexed signatureID);
 
-    function addAttribute(string memory attributeType, bool has_proof, string memory identifier, string memory data, string memory datahash) public returns (uint attributeID) {
+    function addAttribute(string memory attributeType, bool has_proof, bytes32 identifier, string memory data, string memory datahash) public returns (uint attributeID) {
 
         attributeID = attributes++;
         

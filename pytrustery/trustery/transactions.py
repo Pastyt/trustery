@@ -1,8 +1,5 @@
 """API for making Trustery tranactions."""
 
-from web3 import Web3
-from trustery.utils_py3 import decode_hex
-
 import io
 from ethereum import abi
 from trustery.ethapi import w3,myContract
@@ -10,8 +7,8 @@ from trustery.ipfsapi import ipfsclient
 from trustery.gpgapi import generate_pgp_attribute_data
 from trustery.ethapi import TRUSTERY_ABI
 from trustery.ethapi import TRUSTERY_DEFAULT_ADDRESS
+
 import sys
-from trustery.ethapi import encode_api_data
 
 class Transactions(object):
     """API for making Trustery tranactions."""
@@ -60,8 +57,8 @@ class Transactions(object):
         identifier has type str so need to change to bytes32
         """
         myContract.functions.addAttribute( attributetype, has_proof, 
-        identifier, data , datahash ).transact()      
-    
+        identifier.encode('utf-8'), data , datahash ).transact()
+
     def add_attribute_with_hash(self, attributetype, has_proof, identifier, data):
         """{"address": TRUSTERY_DEFAULT_ADDRESS}e of address.
         has_proof: True if the attribute has a cryptographic proof, otherwise False.

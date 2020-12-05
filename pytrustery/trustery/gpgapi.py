@@ -42,12 +42,15 @@ def generate_pgp_attribute_data(keyid, address):
     #try:
         # Import public key.
     import_results = tempgpg.gpgclient.import_keys(public_key)
-        # Check that only one key has been imported.
-        #if import_results.counts != 1:
-        #   raise ValueError("invalid PGP key ID specified")
+    # Check that only one key has been imported.               IDK need this or not
+    #if import_results.counts != 1:
+    #   raise ValueError("invalid PGP key ID specified")
 
-        # Get key fingerprint.
-    fingerprint = str(import_results.fingerprints[0])
+    # Get key fingerprint.
+
+    #Size of fingerprint is 40bytes Identifier has only 32 so we cut first 8.
+    fingerprint = import_results.fingerprints[0]
+    fingerprint = fingerprint[8:]
     #finally:
         # Destroy temporary GPG interface.
     tempgpg.destroy()
@@ -79,8 +82,7 @@ def process_proof(data):
     address = ''
     key_mode = False
     signature_mode = False
-    for line in data.split('\n'):
-        line = line.strip()
+    for line in data.splitlines():
         if line == '-----END PGP PUBLIC KEY BLOCK-----':
             key_mode = False
             key += line + '\n'
@@ -100,7 +102,7 @@ def process_proof(data):
 
     # Create temporary keychain and import key.
     tempgpg = TempGPG()
-    import_results = tempgpg.gpgclient.import_keys(key)
+    tempgpg.gpgclient.import_keys(key)
 
     verified = tempgpg.gpgclient.verify(signature)
 
@@ -108,5 +110,5 @@ def process_proof(data):
 
     if not verified:
         return False
-
-    return (address, verified.fingerprint)
+    #Same with this fingerprint max size is 32
+    return (address, verified.fingerprint[8:])
