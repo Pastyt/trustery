@@ -1,16 +1,12 @@
 //"SPDX-License-Identifier: UNLICENSED"
 
-pragma solidity  ^0.7.2;
+pragma solidity  ^0.7.5;
 
 contract Trustery {
-    struct Signature {
-        address signer;
-    }
 
-    uint public attributes;
-    Signature[1000] public signatures;
-    uint public signcount;
-    uint public revocations;
+    uint private attributes;
+    address[] private signatures;
+    uint private revocations;
 
     event AttributeAdded(uint indexed attributeID, address indexed owner, string attributeType, bool has_proof, bytes32 indexed identifier, string data, string datahash);
     event AttributeSigned(uint indexed signatureID, address indexed signer, uint indexed attributeID, uint expiry);
@@ -21,21 +17,21 @@ contract Trustery {
         attributeID = attributes++;
         
         emit AttributeAdded(attributeID, msg.sender, attributeType, has_proof, identifier, data, datahash);
+        return attributeID;
 
     }
 
     function signAttribute(uint attributeID, uint expiry) public returns (uint signatureID) {
 
-        signatureID=signcount++;
-        signatures[signcount-1].signer=msg.sender;
-
+        signatureID = signatures.length;
+        signatures.push(msg.sender);
         emit  AttributeSigned(signatureID, msg.sender, attributeID, expiry);
 
     }
 
     function revokeSignature(uint signatureID) public returns (uint revocationID) {
 
-        require(signatures[signatureID].signer == msg.sender);
+        require(signatures[signatureID] == msg.sender);
         revocationID = revocations++;
 
         emit SignatureRevoked(revocationID, signatureID);

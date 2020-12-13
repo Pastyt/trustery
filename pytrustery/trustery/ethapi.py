@@ -11,13 +11,13 @@ from web3 import Web3
 #from trustery.testcontract import w3,myContract
 import trustery
 # Trustery contract constants.
-TRUSTERY_DEFAULT_ADDRESS = '0xEF0A66be3F6F2b5F7121d1BF8b84837D82cB660D'
+TRUSTERY_DEFAULT_ADDRESS = '0xed0999Cf5A1813021d5A7AF94680a347DF56C915'
 TRUSTERY_ABI = json.load(open(os.path.join(os.path.dirname(trustery.__file__), 'trustery_abi.json')))
 # Ethereum client interface.
-w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
-w3.eth.defaultAccount=w3.eth.coinbase
+w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
+w3.eth.defaultAccount = w3.eth.coinbase
 #Allow transactions from web3.
-w3.geth.personal.unlock_account(w3.eth.defaultAccount,'1', 15000)
+#Need to unlock account in geth
 myContract = w3.eth.contract(address=TRUSTERY_DEFAULT_ADDRESS, abi=TRUSTERY_ABI)
 
 def encode_web3_hex(data):
